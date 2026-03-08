@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بطاقة عيد</title>
+
+    <link rel="icon" type="image/png" href="https://app.talbinah.net/images/icons/logo-2.png">
+    <link rel="apple-touch-icon" href="https://app.talbinah.net/images/icons/logo-2.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #081b4b, #0c2a78, #1b3ea7);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            z-index: 2;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .controls input {
+            grid-column: span 2;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 18px;
+            text-align: center;
+            background: white;
+            color: #081b4b;
+            font-weight: bold;
+        }
+
+        .controls button {
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-hd {
+            background: #f4c542;
+            color: #081b4b;
+        }
+
+        .btn-4k {
+            background: #ffd700;
+            color: #081b4b;
+        }
+
+        .btn-share {
+            background: #ffffff;
+            color: #081b4b;
+            grid-column: span 2;
+            font-size: 16px;
+        }
+
+        .controls button:active {
+            transform: scale(0.96);
+        }
+
+        /* Fixed Aspect Ratio Preview Area */
+        .preview-area {
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 10px;
+            /* This ensures the container preserves space for the 4:5 ratio */
+            aspect-ratio: 1080 / 1350;
+        }
+
+        .scale-wrapper {
+            position: absolute;
+            top: 0;
+            transform-origin: top center;
+        }
+
+        /* The Card - Locked at 1080x1350 */
+        .card {
+            width: 1080px;
+            height: 1350px;
+            background: url("./eid-bg.png") center/cover no-repeat;
+            border-radius: 0px;
+            /* Sharp edges look better for shared images */
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border-radius: 2rem;
+        }
+
+        .name-container {
+            position: absolute;
+            bottom: 320px;
+            /* Adjusted for better visual balance */
+            width: 100%;
+            text-align: center;
+            padding: 0 60px;
+        }
+
+        .name-text {
+            font-size: 90px;
+            color: #1b3ea7;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="stars"></canvas>
+
+    <div class="container">
+        <h2>اكتب اسمك على بطاقة العيد 🌙</h2>
+
+        <div class="controls">
+            <input id="nameInput" type="text" placeholder="أدخل الاسم هنا..." maxlength="25">
+            <button class="btn-hd" onclick="exportImage(2, 'hd')"><i class="fa-solid fa-image"></i>
+                تحميل HD
+            </button>
+            <button class="btn-4k" onclick="exportImage(4, '4k')"><i class="fa-solid fa-crown"></i>
+                تحميل 4K
+            </button>
+            <button class="btn-share" onclick="shareCard()"><i class="fa-solid fa-share-nodes"></i>
+                إرسال البطاقة
+            </button>
+        </div>
+
+        <div class="preview-area">
+            <div id="scaleWrapper" class="scale-wrapper">
+                <div id="card" class="card">
+                    <div class="name-container">
+                        <div id="nameDisplay" class="name-text"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const nameInput = document.getElementById("nameInput");
+        const nameDisplay = document.getElementById("nameDisplay");
+        const scaleWrapper = document.getElementById("scaleWrapper");
+        const card = document.getElementById("card");
+
+        // 1. Precise Font Scaling
+        nameInput.addEventListener("input", (e) => {
+            const val = e.target.value.trim();
+            nameDisplay.innerText = val || "";
+
+            let size = 90;
+            nameDisplay.style.fontSize = size + "px";
+            while (nameDisplay.offsetWidth > 900 && size > 30) {
+                size -= 2;
+                nameDisplay.style.fontSize = size + "px";
+            }
+        });
+
+        // 2. Responsive Preview (Matches 1080/1350 ratio to screen)
+        function resizePreview() {
+            const containerWidth = document.querySelector('.preview-area').offsetWidth;
+            const cardWidth = 1080;
+            const scale = containerWidth / cardWidth;
+            scaleWrapper.style.transform = `scale(${scale})`;
+        }
+
+        window.addEventListener("resize", resizePreview);
+        window.addEventListener("load", resizePreview);
+
+        // 3. Perfect Aspect Ratio Export
+        async function capture(multiplier) {
+            // Force temporary scale of 1 for perfect pixel capture
+            const originalTransform = scaleWrapper.style.transform;
+            scaleWrapper.style.transform = "scale(1)";
+
+            // html2canvas will now capture the exact 1080x1350 card
+            const canvas = await html2canvas(card, {
+                scale: multiplier, // multiplier 1 = 1080px, 2 = 2160px (4K)
+                useCORS: true,
+                allowTaint: false,
+                logging: false,
+                width: 1080,
+                height: 1350
+            });
+
+            scaleWrapper.style.transform = originalTransform;
+            return canvas;
+        }
+
+        async function exportImage(m, label) {
+            const canvas = await capture(m);
+            const link = document.createElement("a");
+            link.download = `Eid_Card_${label}.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
+            link.click();
+        }
+
+        async function shareCard() {
+            try {
+                const canvas = await capture(1.5); // Optimal sharing size (~1600px height)
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], "Eid_Greeting.png", { type: "image/png" });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: 'تهنئة العيد',
+                            text: 'كل عام وأنتم بخير ✨'
+                        });
+                    } else {
+                        alert("المشاركة المباشرة غير مدعومة. يرجى تحميل الصورة أولاً.");
+                    }
+                }, 'image/png', 0.9);
+            } catch (err) {
+                console.error("Error sharing:", err);
+            }
+        }
+
+        // 4. Background Stars
+        const starCanvas = document.getElementById("stars");
+        const ctx = starCanvas.getContext("2d");
+        let stars = [];
+
+        function initStars() {
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * starCanvas.width,
+                    y: Math.random() * starCanvas.height,
+                    size: Math.random() * 2,
+                    speed: 0.1 + Math.random() * 0.5
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            stars.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+                s.y += s.speed;
+                if (s.y > starCanvas.height) s.y = 0;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener("resize", initStars);
+        initStars();
+        drawStars();
+    </script>
+</body>
+
+</html>
