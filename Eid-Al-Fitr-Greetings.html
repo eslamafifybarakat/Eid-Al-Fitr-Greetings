@@ -4,13 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بطاقة عيد</title>
+
+    <title>صانع بطاقات تهنئة العيد | صمم بطاقة احترافية باسمك مجاناً</title>
+    <meta name="title" content="صانع بطاقات تهنئة العيد | صمم بطاقة احترافية باسمك مجاناً">
+    <meta name="description"
+        content="أسهل طريقة لتصميم بطاقة تهنئة عيد الفطر وعيد الأضحى. اكتب اسمك على أجمل التصاميم وحملها بجودة 4K أو شاركها مباشرة عبر واتساب وماسنجر.">
+    <meta name="keywords"
+        content="بطاقة عيد, تهنئة العيد, اكتب اسمك على بطاقة العيد, معايدة العيد باسمك, تصميم بطاقات تهنئة, عيد مبارك, بطاقة 4K">
+    <meta name="author" content="Talbinah App">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Arabic">
+    <meta name="revisit-after" content="7 days">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://app.talbinah.net/">
+    <meta property="og:title" content="صانع بطاقات تهنئة العيد الاحترافية 🌙">
+    <meta property="og:description" content="اكتب اسمك على بطاقة العيد بجودة عالية وشاركها مع أحبائك بضغطة زر.">
+    <meta property="og:image" content="https://app.talbinah.net/images/icons/logo-2.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="بطاقة العيد">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="صانع بطاقات تهنئة العيد باسمك">
+    <meta name="twitter:description" content="صمم بطاقة تهنئة العيد الخاصة بك الآن بجودة 4K وشاركها مع أصدقائك.">
+    <meta name="twitter:image" content="https://app.talbinah.net/images/icons/logo-2.png">
+
+    <meta name="theme-color" content="#081b4b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="بطاقة العيد">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
 
     <link rel="icon" type="image/png" href="https://app.talbinah.net/images/icons/logo-2.png">
     <link rel="apple-touch-icon" href="https://app.talbinah.net/images/icons/logo-2.png">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        media="print" onload="this.media='all'">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
@@ -33,6 +68,7 @@
             padding: 20px;
         }
 
+        /* Performance: Ensure canvas doesn't trigger layout shifts */
         #stars {
             position: fixed;
             top: 0;
@@ -41,6 +77,7 @@
             height: 100%;
             z-index: -1;
             pointer-events: none;
+            contain: strict;
         }
 
         .container {
@@ -53,7 +90,8 @@
             gap: 15px;
         }
 
-        h2 {
+        h1 {
+            /* Changed to H1 for SEO, styled like your previous H2 */
             text-align: center;
             font-size: clamp(1.1rem, 4vw, 1.5rem);
             margin-bottom: 5px;
@@ -70,12 +108,19 @@
             grid-column: span 2;
             padding: 14px;
             border-radius: 12px;
-            border: none;
+            border: 2px solid transparent;
             font-size: 18px;
             text-align: center;
             background: white;
             color: #081b4b;
             font-weight: bold;
+            transition: border-color 0.3s;
+        }
+
+        /* Accessibility: Visual focus for keyboard users */
+        .controls input:focus {
+            outline: none;
+            border-color: #f4c542;
         }
 
         .controls button {
@@ -84,7 +129,7 @@
             border-radius: 12px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.2s;
+            transition: transform 0.2s, background-color 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -112,7 +157,6 @@
             transform: scale(0.96);
         }
 
-        /* Fixed Aspect Ratio Preview Area */
         .preview-area {
             width: 100%;
             position: relative;
@@ -120,23 +164,23 @@
             justify-content: center;
             overflow: hidden;
             margin-top: 10px;
-            /* This ensures the container preserves space for the 4:5 ratio */
             aspect-ratio: 1080 / 1350;
+            background: rgba(255, 255, 255, 0.05);
+            /* Placeholder while image loads */
+            border-radius: 2rem;
         }
 
         .scale-wrapper {
             position: absolute;
             top: 0;
             transform-origin: top center;
+            will-change: transform;
         }
 
-        /* The Card - Locked at 1080x1350 */
         .card {
             width: 1080px;
             height: 1350px;
             background: url("./eid-bg.png") center/cover no-repeat;
-            border-radius: 0px;
-            /* Sharp edges look better for shared images */
             position: relative;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             border-radius: 2rem;
@@ -145,7 +189,6 @@
         .name-container {
             position: absolute;
             bottom: 320px;
-            /* Adjusted for better visual balance */
             width: 100%;
             text-align: center;
             padding: 0 60px;
@@ -156,61 +199,73 @@
             color: #1b3ea7;
             font-weight: 700;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
-            white-space: nowrap;
+
+            /* Enabled Wrapping */
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.2;
+            display: block;
+
+            /* Ensure it doesn't push the card layout */
+            max-width: 960px;
+            /* Leave some padding */
+            margin: 0 auto;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="stars"></canvas>
+    <canvas id="stars" aria-hidden="true"></canvas>
 
-    <div class="container">
-        <h2>اكتب اسمك على بطاقة العيد 🌙</h2>
+    <main class="container">
+        <h1>اكتب اسمك على بطاقة العيد 🌙</h1>
 
-        <div class="controls">
-            <input id="nameInput" type="text" placeholder="أدخل الاسم هنا..." maxlength="25">
-            <button class="btn-hd" onclick="exportImage(2, 'hd')"><i class="fa-solid fa-image"></i>
-                تحميل HD
-            </button>
-            <button class="btn-4k" onclick="exportImage(4, '4k')"><i class="fa-solid fa-crown"></i>
-                تحميل 4K
-            </button>
-            <button class="btn-share" onclick="shareCard()"><i class="fa-solid fa-share-nodes"></i>
-                إرسال البطاقة
-            </button>
-        </div>
+        <section class="controls" aria-label="أدوات التحكم بالبطاقة">
+            <label for="nameInput" class="sr-only" style="display:none;">الاسم</label>
+            <input id="nameInput" type="text" placeholder="أدخل الاسم هنا..." maxlength="25"
+                aria-label="أدخل الاسم الذي سيظهر على البطاقة">
 
-        <div class="preview-area">
+            <button class="btn-hd" onclick="exportImage(2, 'hd')" aria-label="تحميل البطاقة بجودة عالية">
+                <i class="fa-solid fa-image" aria-hidden="true"></i> تحميل HD
+            </button>
+            <button class="btn-4k" onclick="exportImage(4, '4k')" aria-label="تحميل البطاقة بجودة فائقة 4K">
+                <i class="fa-solid fa-crown" aria-hidden="true"></i> تحميل 4K
+            </button>
+            <button class="btn-share" onclick="shareCard()" aria-label="مشاركة البطاقة مع الأصدقاء">
+                <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> إرسال البطاقة
+            </button>
+        </section>
+
+        <article class="preview-area" aria-label="معاينة البطاقة">
             <div id="scaleWrapper" class="scale-wrapper">
                 <div id="card" class="card">
                     <div class="name-container">
-                        <div id="nameDisplay" class="name-text"></div>
+                        <div id="nameDisplay" class="name-text" aria-live="polite"></div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
+    </main>
 
     <script>
+        /** * PERFORMANCE & ACCESSIBILITY LOGIC
+         */
         const nameInput = document.getElementById("nameInput");
         const nameDisplay = document.getElementById("nameDisplay");
         const scaleWrapper = document.getElementById("scaleWrapper");
         const card = document.getElementById("card");
 
-        // 1. Precise Font Scaling
+        // Use a debounce or efficient update for font scaling
         nameInput.addEventListener("input", (e) => {
             const val = e.target.value.trim();
             nameDisplay.innerText = val || "";
 
             let size = 90;
             nameDisplay.style.fontSize = size + "px";
-            while (nameDisplay.offsetWidth > 900 && size > 30) {
-                size -= 2;
-                nameDisplay.style.fontSize = size + "px";
-            }
+
         });
 
-        // 2. Responsive Preview (Matches 1080/1350 ratio to screen)
         function resizePreview() {
             const containerWidth = document.querySelector('.preview-area').offsetWidth;
             const cardWidth = 1080;
@@ -218,18 +273,15 @@
             scaleWrapper.style.transform = `scale(${scale})`;
         }
 
-        window.addEventListener("resize", resizePreview);
+        window.addEventListener("resize", resizePreview, { passive: true });
         window.addEventListener("load", resizePreview);
 
-        // 3. Perfect Aspect Ratio Export
         async function capture(multiplier) {
-            // Force temporary scale of 1 for perfect pixel capture
             const originalTransform = scaleWrapper.style.transform;
             scaleWrapper.style.transform = "scale(1)";
 
-            // html2canvas will now capture the exact 1080x1350 card
             const canvas = await html2canvas(card, {
-                scale: multiplier, // multiplier 1 = 1080px, 2 = 2160px (4K)
+                scale: multiplier,
                 useCORS: true,
                 allowTaint: false,
                 logging: false,
@@ -242,17 +294,22 @@
         }
 
         async function exportImage(m, label) {
-            const canvas = await capture(m);
-            const link = document.createElement("a");
-            link.download = `Eid_Card_${label}.png`;
-            link.href = canvas.toDataURL("image/png", 1.0);
-            link.click();
+            try {
+                const canvas = await capture(m);
+                const link = document.createElement("a");
+                link.download = `Eid_Card_${label}.png`;
+                link.href = canvas.toDataURL("image/png", 1.0);
+                link.click();
+            } catch (e) {
+                console.error("Export failed", e);
+            }
         }
 
         async function shareCard() {
             try {
-                const canvas = await capture(1.5); // Optimal sharing size (~1600px height)
+                const canvas = await capture(1.5);
                 canvas.toBlob(async (blob) => {
+                    if (!blob) return;
                     const file = new File([blob], "Eid_Greeting.png", { type: "image/png" });
 
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -262,7 +319,7 @@
                             text: 'كل عام وأنتم بخير ✨'
                         });
                     } else {
-                        alert("المشاركة المباشرة غير مدعومة. يرجى تحميل الصورة أولاً.");
+                        alert("المشاركة المباشرة غير مدعومة في هذا المتصفح. يرجى تحميل الصورة أولاً.");
                     }
                 }, 'image/png', 0.9);
             } catch (err) {
@@ -270,7 +327,7 @@
             }
         }
 
-        // 4. Background Stars
+        // Optimized Star Background Animation
         const starCanvas = document.getElementById("stars");
         const ctx = starCanvas.getContext("2d");
         let stars = [];
@@ -279,7 +336,8 @@
             starCanvas.width = window.innerWidth;
             starCanvas.height = window.innerHeight;
             stars = [];
-            for (let i = 0; i < 100; i++) {
+            const count = window.innerWidth < 500 ? 50 : 100; // Performance: Fewer stars on mobile
+            for (let i = 0; i < count; i++) {
                 stars.push({
                     x: Math.random() * starCanvas.width,
                     y: Math.random() * starCanvas.height,
@@ -292,17 +350,18 @@
         function drawStars() {
             ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
             ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-            stars.forEach(s => {
+            for (let i = 0; i < stars.length; i++) {
+                const s = stars[i];
                 ctx.beginPath();
                 ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                 ctx.fill();
                 s.y += s.speed;
                 if (s.y > starCanvas.height) s.y = 0;
-            });
+            }
             requestAnimationFrame(drawStars);
         }
 
-        window.addEventListener("resize", initStars);
+        window.addEventListener("resize", initStars, { passive: true });
         initStars();
         drawStars();
     </script>
